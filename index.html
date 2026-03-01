@@ -1195,7 +1195,12 @@
 
                 if (!textResponse.ok) {
                     const errText = await textResponse.text();
-                    throw new Error(`API Hatası: Lütfen API anahtarınızın geçerli olduğundan emin olun.`);
+                    let errMsg = "API Anahtarı geçersiz veya yetkisiz.";
+                    try {
+                        const errJson = JSON.parse(errText);
+                        errMsg = errJson.error.message;
+                    } catch(e) {}
+                    throw new Error(`Google API Hatası (${textResponse.status}): ${errMsg}. Lütfen Google Cloud Console üzerinden kısıtlamaları (Referrer) kontrol edin.`);
                 }
 
                 // --- Metin İşleme ---
@@ -1263,7 +1268,7 @@
                     <div class="p-5 bg-red-500/10 text-red-200 rounded-xl border border-red-500/30 overflow-x-auto">
                         <div class="flex items-center gap-2 font-bold mb-2">
                             <i class="fas fa-exclamation-triangle text-red-500"></i> 
-                            API Bağlantı Hatası
+                            API Bağlantı Hatası Detayı
                         </div>
                         <p class="text-xs font-mono text-red-300 leading-relaxed break-words whitespace-pre-wrap">${error.message || error}</p>
                     </div>`;
