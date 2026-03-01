@@ -689,7 +689,7 @@
                                 </div>
                                 
                                 <!-- Yapay Zekanın Çizdiği Tasarım (Mix Blend Mode ile Mühürleniyor) -->
-                                <img id="aiGeneratedImage" src="" alt="Yapay Zeka Logo Tasarımı" class="mockup-design absolute top-0 left-0 h-full object-contain z-20 hidden transition-all duration-700" style="width: 100%;" crossorigin="anonymous" />
+                                <img id="aiGeneratedImage" src="" alt="Yapay Zeka Logo Tasarımı" class="mockup-design absolute top-0 left-0 h-full object-contain z-20 hidden transition-all duration-700" style="width: 100%;" crossorigin="anonymous" referrerpolicy="no-referrer" />
                                 
                             </div>
 
@@ -1253,7 +1253,7 @@
                 generatedImage.onerror = () => {
                     imgLoading.innerHTML = `
                         <i class="fas fa-image-slash text-4xl text-slate-400 mb-3"></i>
-                        <span class="text-xs text-slate-500 font-bold text-center px-4">Görsel yüklenemedi.</span>
+                        <span class="text-xs text-slate-500 font-bold text-center px-4">Görsel yüklenemedi. (Güvenlik Koruması)</span>
                     `;
                     imgLoading.classList.remove('animate-pulse');
                 };
