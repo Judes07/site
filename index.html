@@ -1153,19 +1153,20 @@
                 templateImage.src = bagTemplates['DEFAULT']; 
             }, 300);
 
-            const systemPrompt = `Sen 'AntalyaBaskılıPoşet' firmasının akıllı satış asistanısın. Kullanıcı sana işletme türünü söyleyecek. 
-            Amacın ona en doğru ambalajı önermek. 
+            // Metin İstemi (Değişken birleştirildi)
+            const combinedPrompt = `Sen 'AntalyaBaskılıPoşet' firmasının akıllı satış asistanısın. Amacın müşteriye en doğru ambalajı önermek. 
             Yanıt Formatı: HTML formatında olacak. 
             <ul>
                 <li><strong>Önerilen Model:</strong> (Atlet, El Geçme (Çanta), Pastane, Torba veya Jelatin modellerinden birini seçip kısaca nedenini açıkla)</li>
                 <li><strong>Slogan 1:</strong> (Markası için yaratıcı, kısa ambalaj sloganı)</li>
                 <li><strong>Slogan 2:</strong> (Markası için yaratıcı, kısa ambalaj sloganı)</li>
             </ul>
-            Yanıt dilin samimi, profesyonel ve Türkçe olsun. Markdown (\\\`\`\`html) kullanma, direkt saf html dön.
+            Yanıt dilin samimi, profesyonel ve Türkçe olsun. Markdown kullanma, direkt saf html dön.
             ÖNEMLİ ZORUNLULUK: Cevabının en sonuna, seçtiğin modele uygun olarak şu etiketlerden sadece BİRİNİ mutlaka ekle: [MODEL:ATLET], [MODEL:CANTA], [MODEL:PASTANE], [MODEL:TORBA].
             
             Kullanıcının İşletmesi/Sektörü: ${businessInput}`;
 
+            // Görsel İstemi (Ücretsiz Alternatif: Pollinations AI)
             const imgPrompt = `A flat, 2D minimalist graphic design and logo for a business in the '${businessInput}' sector. Designed for packaging print. Pure white background, highly detailed, centered, clean vector style, black and brand colors. No background elements, no shadows, no 3D mockup, just the flat 2D graphic design on pure white background.`;
             const encodedPrompt = encodeURIComponent(imgPrompt);
             const randomSeed = Math.floor(Math.random() * 1000000);
