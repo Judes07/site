@@ -436,10 +436,8 @@
                 <!-- Ürün 1: Atlet Poşet -->
                 <article class="reveal product-card bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col group relative">
                     <div class="absolute top-4 right-4 bg-secondary text-white text-xs font-bold px-3 py-1 rounded-full z-20 shadow-md">Çok Satan</div>
-                    <!-- Yüksekliği artırıldı: h-64 -> h-80 ve bg-white yapıldı -->
                     <div class="product-slider relative h-80 bg-slate-50/50 w-full cursor-grab active:cursor-grabbing border-b border-slate-100">
                         <div class="slider-track flex h-full transition-transform duration-500 ease-out w-full">
-                            <!-- padding p-4 den p-1'e düşürülüp boyut büyütüldü -->
                             <img src="AntalyaBaskılıPoşetAtlet.png" onerror="this.src='https://placehold.co/600x800/e0f2fe/0284c7?text=Atlet+Poset+1'" loading="lazy" class="w-full h-full object-contain p-1 md:p-2 flex-shrink-0" alt="Baskılı Atlet Poşet">
                             <img src="https://placehold.co/600x800/e0f2fe/0284c7?text=Atlet+Poset+2" loading="lazy" class="w-full h-full object-contain p-1 md:p-2 flex-shrink-0" alt="Baskılı Atlet Poşet">
                         </div>
@@ -1104,12 +1102,11 @@
             window.open('https://wa.me/' + phone + '?text=' + msg, '_blank');
         }
 
-        // --- 7. Gemini AI Asistan Entegrasyonu (Şablon Üzerine Tasarım Modeli) ---
-        const apiKey = "AIzaSyBvDY_nsUlBnNWQUEkQiF1fnJ6z72meKIE"; // API Key
+        // --- 7. Gemini AI Asistan Entegrasyonu ---
+        const apiKey = "AIzaSyDjUOEvAICghq74D8fnnki38HJP17OhWiM"; // Yeni API Key eklendi
         
-        // Kendi boş şablon fotoğraflarınızı buraya ekleyebilirsiniz:
         const bagTemplates = {
-            'ATLET': 'AtletŞablon1.jpg', // Yüklediğiniz YENİ tekli atlet poşet şablonu
+            'ATLET': 'AtletŞablon1.jpg',
             'CANTA': 'https://placehold.co/400x500/f8fafc/cbd5e1?text=Bos+Karton+Canta+Sablonu',
             'PASTANE': 'https://placehold.co/400x500/f8fafc/cbd5e1?text=Bos+Pastane+Poseti+Sablonu',
             'TORBA': 'https://placehold.co/400x500/f8fafc/cbd5e1?text=Bos+Ambalaj+Torba+Sablonu',
@@ -1134,7 +1131,6 @@
                 return;
             }
 
-            // Arayüzü Yükleniyor durumuna getir
             btn.disabled = true;
             btnText.innerText = "Yapay Zeka Tasarlıyor...";
             btnLoader.classList.remove('hidden');
@@ -1148,7 +1144,6 @@
                 generatedImage.classList.add('hidden');
                 imgLoading.classList.remove('hidden');
                 
-                // Yükleme ekranını sıfırla
                 imgLoading.innerHTML = `
                     <i class="fas fa-paint-brush text-4xl text-indigo-500 mb-3"></i>
                     <span class="text-xs text-indigo-700 font-bold tracking-wider">Tasarım Şablona İşleniyor...</span>
@@ -1158,9 +1153,8 @@
                 templateImage.src = bagTemplates['DEFAULT']; 
             }, 300);
 
-            // Metin İstemi
-            const combinedPrompt = `Sen 'AntalyaBaskılıPoşet' firmasının akıllı satış asistanısın. Amacın müşteriye en doğru ambalajı önermek. 
-            
+            const systemPrompt = `Sen 'AntalyaBaskılıPoşet' firmasının akıllı satış asistanısın. Kullanıcı sana işletme türünü söyleyecek. 
+            Amacın ona en doğru ambalajı önermek. 
             Yanıt Formatı: HTML formatında olacak. 
             <ul>
                 <li><strong>Önerilen Model:</strong> (Atlet, El Geçme (Çanta), Pastane, Torba veya Jelatin modellerinden birini seçip kısaca nedenini açıkla)</li>
@@ -1172,7 +1166,6 @@
             
             Kullanıcının İşletmesi/Sektörü: ${businessInput}`;
 
-            // Görsel İstemi (Ücretsiz Alternatif: Pollinations AI)
             const imgPrompt = `A flat, 2D minimalist graphic design and logo for a business in the '${businessInput}' sector. Designed for packaging print. Pure white background, highly detailed, centered, clean vector style, black and brand colors. No background elements, no shadows, no 3D mockup, just the flat 2D graphic design on pure white background.`;
             const encodedPrompt = encodeURIComponent(imgPrompt);
             const randomSeed = Math.floor(Math.random() * 1000000);
