@@ -1159,37 +1159,34 @@
             }, 300);
 
             // Metin İstemi
-            const systemPrompt = `Sen 'AntalyaBaskılıPoşet' firmasının akıllı satış asistanısın. Kullanıcı sana işletme türünü söyleyecek. 
-            Amacın ona en doğru ambalajı önermek. 
+            const combinedPrompt = `Sen 'AntalyaBaskılıPoşet' firmasının akıllı satış asistanısın. Amacın müşteriye en doğru ambalajı önermek. 
+            
             Yanıt Formatı: HTML formatında olacak. 
             <ul>
                 <li><strong>Önerilen Model:</strong> (Atlet, El Geçme (Çanta), Pastane, Torba veya Jelatin modellerinden birini seçip kısaca nedenini açıkla)</li>
                 <li><strong>Slogan 1:</strong> (Markası için yaratıcı, kısa ambalaj sloganı)</li>
                 <li><strong>Slogan 2:</strong> (Markası için yaratıcı, kısa ambalaj sloganı)</li>
             </ul>
-            Yanıt dilin samimi, profesyonel ve Türkçe olsun. Markdown kullanma, direkt saf html dön.
-            ÖNEMLİ ZORUNLULUK: Cevabının en sonuna, seçtiğin modele uygun olarak şu etiketlerden sadece BİRİNİ mutlaka ekle: [MODEL:ATLET], [MODEL:CANTA], [MODEL:PASTANE], [MODEL:TORBA].`;
+            Yanıt dilin samimi, profesyonel ve Türkçe olsun. Markdown (\\\`\`\`html) kullanma, direkt saf html dön.
+            ÖNEMLİ ZORUNLULUK: Cevabının en sonuna, seçtiğin modele uygun olarak şu etiketlerden sadece BİRİNİ mutlaka ekle: [MODEL:ATLET], [MODEL:CANTA], [MODEL:PASTANE], [MODEL:TORBA].
             
-            const userQuery = `İşletmemin sektörü/türü: ${businessInput}`;
+            Kullanıcının İşletmesi/Sektörü: ${businessInput}`;
 
             // Görsel İstemi (Ücretsiz Alternatif: Pollinations AI)
-            // İngilizce prompt'u URL için kodluyoruz
             const imgPrompt = `A flat, 2D minimalist graphic design and logo for a business in the '${businessInput}' sector. Designed for packaging print. Pure white background, highly detailed, centered, clean vector style, black and brand colors. No background elements, no shadows, no 3D mockup, just the flat 2D graphic design on pure white background.`;
             const encodedPrompt = encodeURIComponent(imgPrompt);
-            // Rastgelelik katmak için seed ekliyoruz ki her seferinde farklı logo çizsin
             const randomSeed = Math.floor(Math.random() * 1000000);
             const freeImageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=800&nologo=true&seed=${randomSeed}`;
 
             const currentKey = apiKey || window.__API_KEY__ || ""; 
 
             try {
-                // Sadece Metin İsteği (Text API - Ücretsiz Gemini 1.5 Flash üzerinden)
-                const textResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`, {
+                // Sadece Metin İsteği - Evrensel olarak erişilebilen "gemini-pro" (Gemini 1.0) modelini kullanıyoruz.
+                const textResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${currentKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: userQuery }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                        contents: [{ parts: [{ text: combinedPrompt }] }]
                     })
                 });
 
@@ -1200,7 +1197,7 @@
                         const errJson = JSON.parse(errText);
                         errMsg = errJson.error.message;
                     } catch(e) {}
-                    throw new Error(`Google API Hatası (${textResponse.status}): ${errMsg}. Lütfen Google Cloud Console üzerinden kısıtlamaları (Referrer) kontrol edin.`);
+                    throw new Error(`Google API Hatası (${textResponse.status}): ${errMsg}. Lütfen Google Cloud Console üzerinden kısıtlamaları kontrol edin.`);
                 }
 
                 // --- Metin İşleme ---
@@ -1253,7 +1250,7 @@
                 generatedImage.onerror = () => {
                     imgLoading.innerHTML = `
                         <i class="fas fa-image-slash text-4xl text-slate-400 mb-3"></i>
-                        <span class="text-xs text-slate-500 font-bold text-center px-4">Görsel yüklenemedi. (Güvenlik Koruması)</span>
+                        <span class="text-xs text-slate-500 font-bold text-center px-4">Görsel yüklenemedi.</span>
                     `;
                     imgLoading.classList.remove('animate-pulse');
                 };
