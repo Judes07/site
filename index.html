@@ -1105,7 +1105,7 @@
         }
 
         // --- 7. Gemini AI Asistan Entegrasyonu (Şablon Üzerine Tasarım Modeli) ---
-        const apiKey = "AIzaSyDK9L4bC9PE0dawHFAZxZehglOxBruwJPs"; // API Key ortamdan sağlanacaktır
+        const apiKey = "AIzaSyBvDY_nsUlBnNWQUEkQiF1fnJ6z72meKIE"; // Yeni API Key eklendi
         
         // Kendi boş şablon fotoğraflarınızı buraya ekleyebilirsiniz:
         const bagTemplates = {
@@ -1175,26 +1175,41 @@
             async function callGemini() {
                 try {
                     // Paralel API Çağrıları (Görsel ve Metin aynı anda başlar)
-                    const textRequest = fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${currentKey}`, {
+                    // Not: Github Pages'te sorunsuz çalışması için genel erişime açık olan 1.5-flash ve imagen-3.0 modellerine geçildi.
+                    const textRequest = fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             contents: [{ parts: [{ text: userQuery }] }],
                             systemInstruction: { parts: [{ text: systemPrompt }] }
                         })
-                    }).then(res => {
-                        if(!res.ok) throw new Error('Text API Bağlantı Hatası');
+                    }).then(async res => {
+                        if(!res.ok) {
+                            const errDetails = await res.text();
+                            console.error('Metin API Bağlantı Hatası:', errDetails);
+                            throw new Error('Text API Bağlantı Hatası');
+                        }
                         return res.json();
                     });
 
-                    const imageRequest = fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${currentKey}`, {
+                    const imageRequest = fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${currentKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             instances: { prompt: imgPrompt },
                             parameters: { sampleCount: 1 }
                         })
-                    }).then(res => res.json()).catch(err => null); 
+                    }).then(async res => {
+                        if(!res.ok) {
+                            const errDetails = await res.text();
+                            console.error('Görsel API Bağlantı Hatası:', errDetails);
+                            return null;
+                        }
+                        return res.json();
+                    }).catch(err => {
+                        console.error('Görsel isteği yakalanamadı:', err);
+                        return null;
+                    }); 
 
                     // --- Metin İşleme ---
                     const textData = await textRequest;
