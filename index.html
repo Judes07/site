@@ -1174,11 +1174,11 @@
 
             const currentKey = apiKey || window.__API_KEY__ || ""; 
 
-            // Otomatik Model Tarayıcı (Fallback System)
+            // Otomatik Model Tarayıcı (Fallback System) - En güncel modellere göre revize edildi
             let textData = null;
             let success = false;
             let errorDetails = "";
-            const modelsToTry = ['gemini-1.5-flash', 'gemini-1.0-pro', 'gemini-pro'];
+            const modelsToTry = ['gemini-1.5-flash-latest', 'gemini-1.0-pro', 'gemini-1.0-pro-latest'];
 
             for (let model of modelsToTry) {
                 try {
