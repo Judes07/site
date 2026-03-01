@@ -436,8 +436,10 @@
                 <!-- Ürün 1: Atlet Poşet -->
                 <article class="reveal product-card bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col group relative">
                     <div class="absolute top-4 right-4 bg-secondary text-white text-xs font-bold px-3 py-1 rounded-full z-20 shadow-md">Çok Satan</div>
+                    <!-- Yüksekliği artırıldı: h-64 -> h-80 ve bg-white yapıldı -->
                     <div class="product-slider relative h-80 bg-slate-50/50 w-full cursor-grab active:cursor-grabbing border-b border-slate-100">
                         <div class="slider-track flex h-full transition-transform duration-500 ease-out w-full">
+                            <!-- padding p-4 den p-1'e düşürülüp boyut büyütüldü -->
                             <img src="AntalyaBaskılıPoşetAtlet.png" onerror="this.src='https://placehold.co/600x800/e0f2fe/0284c7?text=Atlet+Poset+1'" loading="lazy" class="w-full h-full object-contain p-1 md:p-2 flex-shrink-0" alt="Baskılı Atlet Poşet">
                             <img src="https://placehold.co/600x800/e0f2fe/0284c7?text=Atlet+Poset+2" loading="lazy" class="w-full h-full object-contain p-1 md:p-2 flex-shrink-0" alt="Baskılı Atlet Poşet">
                         </div>
@@ -1103,7 +1105,7 @@
         }
 
         // --- 7. Gemini AI Asistan Entegrasyonu ---
-        const apiKey = "AIzaSyDjUOEvAICghq74D8fnnki38HJP17OhWiM"; // Yeni API Key eklendi
+        const apiKey = "AIzaSyDjUOEvAICghq74D8fnnki38HJP17OhWiM"; // API Key
         
         const bagTemplates = {
             'ATLET': 'AtletŞablon1.jpg',
@@ -1153,7 +1155,6 @@
                 templateImage.src = bagTemplates['DEFAULT']; 
             }, 300);
 
-            // Metin İstemi (Değişken birleştirildi)
             const combinedPrompt = `Sen 'AntalyaBaskılıPoşet' firmasının akıllı satış asistanısın. Amacın müşteriye en doğru ambalajı önermek. 
             Yanıt Formatı: HTML formatında olacak. 
             <ul>
@@ -1166,7 +1167,6 @@
             
             Kullanıcının İşletmesi/Sektörü: ${businessInput}`;
 
-            // Görsel İstemi (Ücretsiz Alternatif: Pollinations AI)
             const imgPrompt = `A flat, 2D minimalist graphic design and logo for a business in the '${businessInput}' sector. Designed for packaging print. Pure white background, highly detailed, centered, clean vector style, black and brand colors. No background elements, no shadows, no 3D mockup, just the flat 2D graphic design on pure white background.`;
             const encodedPrompt = encodeURIComponent(imgPrompt);
             const randomSeed = Math.floor(Math.random() * 1000000);
@@ -1174,28 +1174,47 @@
 
             const currentKey = apiKey || window.__API_KEY__ || ""; 
 
-            try {
-                // Sadece Metin İsteği - Evrensel olarak erişilebilen "gemini-pro" (Gemini 1.0) modelini kullanıyoruz.
-                const textResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${currentKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: combinedPrompt }] }]
-                    })
-                });
+            // Otomatik Model Tarayıcı (Fallback System)
+            let textData = null;
+            let success = false;
+            let errorDetails = "";
+            const modelsToTry = ['gemini-1.5-flash', 'gemini-1.0-pro', 'gemini-pro'];
 
-                if (!textResponse.ok) {
-                    const errText = await textResponse.text();
-                    let errMsg = "API Anahtarı geçersiz veya yetkisiz.";
+            for (let model of modelsToTry) {
+                try {
+                    const textResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${currentKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: combinedPrompt }] }]
+                        })
+                    });
+
+                    if (textResponse.ok) {
+                        textData = await textResponse.json();
+                        success = true;
+                        break; 
+                    } else {
+                        const errText = await textResponse.text();
+                        errorDetails = errText;
+                        console.warn(`${model} modelinde hata alındı, diğerine geçiliyor...`);
+                    }
+                } catch(e) {
+                    errorDetails = e.message;
+                }
+            }
+
+            try {
+                if (!success) {
+                    let errMsg = "API Anahtarı geçersiz, yetkisiz veya modeller kapalı.";
                     try {
-                        const errJson = JSON.parse(errText);
+                        const errJson = JSON.parse(errorDetails);
                         errMsg = errJson.error.message;
                     } catch(e) {}
-                    throw new Error(`Google API Hatası (${textResponse.status}): ${errMsg}. Lütfen Google Cloud Console üzerinden kısıtlamaları kontrol edin.`);
+                    throw new Error(`Google API Hatası: ${errMsg}`);
                 }
 
                 // --- Metin İşleme ---
-                const textData = await textResponse.json();
                 let text = textData.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if(text) {
@@ -1233,7 +1252,6 @@
                 }
 
                 // --- Görsel İşleme (Ücretsiz AI Modeli) ---
-                // Resim oluşturma işini dış servise (Pollinations) verdik
                 generatedImage.src = freeImageUrl;
                 
                 generatedImage.onload = () => {
@@ -1254,12 +1272,11 @@
                 
                 imgLoading.classList.add('hidden');
                 
-                // Debug Modu - Hata Ekranı
                 resultText.innerHTML = `
                     <div class="p-5 bg-red-500/10 text-red-200 rounded-xl border border-red-500/30 overflow-x-auto">
                         <div class="flex items-center gap-2 font-bold mb-2">
                             <i class="fas fa-exclamation-triangle text-red-500"></i> 
-                            API Bağlantı Hatası Detayı
+                            API Bağlantı Hatası
                         </div>
                         <p class="text-xs font-mono text-red-300 leading-relaxed break-words whitespace-pre-wrap">${error.message || error}</p>
                     </div>`;
